@@ -5,6 +5,8 @@ import os
 import argparse
 import inquirer
 import re
+from glob import glob
+import cv2
 
 parser = argparse.ArgumentParser()
 
@@ -27,24 +29,24 @@ if __name__ == "__main__":
     cprint("Program is going to ask you some information needed by model\n\n", color=cprint.YELLOW)
 
     available_activations = ['relu', 'elu', 'sigmoid', 'tanh', 'linear']
-    available_losses = ['categorical_crossentropy', 'mse']
+    available_losses = ['sparse_categorical_crossentropy', 'categorical_crossentropy', 'mse']
     available_optimizers = ['adam', 'sgd', 'rmsprop', 'adagrad', 'adadelta']
 
     model_questions = [
         inquirer.Text(name='width', message="Enter picture's width", validate=lambda _,x: re.match(r"^[0-9 -]+$", x), default="32"),
         inquirer.Text(name='height', message="Enter picture's height", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="32"),
-        inquirer.Text(name='depth', message="How many channels does picture have?", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="3"),
-        inquirer.Text(name='output', message="How many categories do you have?", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="10"),
-        inquirer.List(name='activation', message="Which activation function will you use?", choices=available_activations),
-        inquirer.Text(name='dropout', message="Dropout should be set at what rate?", default='0.2', validate=lambda _, x: re.match(r"^0\.[0-9]+]?$", x)),
-        inquirer.List(name='padding', message="Which type of padding will you use?", choices=['same', 'valid']),
+        inquirer.Text(name='depth', message="How many channels does picture have", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="3"),
+        inquirer.Text(name='output', message="How many categories do you have", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="10"),
+        inquirer.List(name='activation', message="Which activation function will you use", choices=available_activations),
+        inquirer.Text(name='dropout', message="Dropout should be set at what rate", default='0.2', validate=lambda _, x: re.match(r"^0\.[0-9]+]?$", x)),
+        inquirer.List(name='padding', message="Which type of padding will you use", choices=['same', 'valid']),
     ]
 
     model_preferences = inquirer.prompt(model_questions)
 
     model = ArNetModel((int(model_preferences['width']), int(model_preferences['height']), int(model_preferences['depth'])), int(model_preferences['output']), dropout_rate=float(model_preferences['dropout']), activation=model_preferences['activation'], padding=model_preferences['padding'])
 
-    selection_message = "Choose what do you want to do right now?"
+    selection_message = "Choose what do you want to do right now"
     options = ["Train model on images", "Load a trained model", "Show model's architecture", "Show model's summary", "Exit"]
     
     questions = [
@@ -62,11 +64,17 @@ if __name__ == "__main__":
             cprint("\nIf you haven't put your dataset in your training folder yet, terminate the program using CTRL+C and put dataset first.\n\n", color=cprint.YELLOW)
 
             train_questions = [
-                inquirer.List(name='loss', message="Which loss function will you use?", choices=available_losses),
-                inquirer.List(name='optimizer', message="How do you like your model to be optimized?", choices=available_optimizers),
-                inquirer.List(name='batch_size', message="How much data should be trained on a single step of training?", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="32"),
-                inquirer.List(name='epochs', message="How many epochs do you need to train your data?", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="10"),
+                inquirer.List(name='loss', message="Loss function", choices=available_losses),
+                inquirer.List(name='optimizer', message="Optimization method", choices=available_optimizers),
+                inquirer.Text(name='batch_size', message="The size of batch traine in a single step", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="32"),
+                inquirer.Text(name='epochs', message="Number of epochs", validate=lambda _, x: re.match(r"^[0-9 -]+$", x), default="10"),
             ]
+
+            train_preferences = inquirer.prompt(train_questions)
+
+            training_folders = glob('./training/*')
+            if len(training_folders) != int(model_preferences['output']):
+                cprint("Number of categories in dataset (folders in training folder) and output shape does not match. Please try again.", color=cprint.RED)
 
         elif selection == 1:
             pass
