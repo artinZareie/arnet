@@ -75,6 +75,8 @@ if __name__ == "__main__":
             training_folders = glob('./training/*')
             if len(training_folders) != int(model_preferences['output']):
                 cprint("Number of categories in dataset (folders in training folder) and output shape does not match. Please try again.", color=cprint.RED)
+            else:
+                labels = []
 
         elif selection == 1:
             pass
