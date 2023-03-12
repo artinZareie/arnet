@@ -3,6 +3,8 @@
 # Prevent tensorflow logs
 import os
 import argparse
+from pick import pick
+from time import sleep
 
 parser = argparse.ArgumentParser()
 
@@ -21,7 +23,23 @@ if __name__ == "__main__":
     cprint = PrintColored()
 
     cprint("\n\n\tWelcome to this application, This application is a client for ArNet architecture by Artin Zareie (https://ipm.ssaa.ir/Search-Result?page=1&DecNo=139950140003004932&RN=105750).\n This architecture uses Convolutional layers and the flatten input itself to train on pictures and classify them. Also it is possible to use this model for regression and other applications, but this speciefic python program is designed for classification problems.\n\n", color=cprint.CYAN_DARK)
+    # sleep(5)
+
+    model = ArNetModel((32, 32, 3), 10)
+
+    selection_message = "Choose what do you want to do right now?"
+    options = ["Train model on images", "Predit classes for an instance", "Show model's architecture", "Show model's summary"]
+    option, selection = pick(options, selection_message)
+
+    if selection == 0:
+        pass
+    elif selection == 1:
+        pass
+    elif selection == 2:
+        
+        model.plot_model()
+        cprint(f"Image is saved in {os.getcwd()}{os.sep}model_architecture.png", color=cprint.GREEN)
+
+    elif selection == 3:
+        model.summary()
     
-    # model = ArNetModel((32, 32, 3), 10)
-    # model.plot_model()
-    # model.summary()

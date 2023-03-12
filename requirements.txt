@@ -4,3 +4,5 @@ numpy
 pydot
 graphviz
 argparse
+pick
+opencv-python
