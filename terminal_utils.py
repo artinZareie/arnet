@@ -1,3 +1,6 @@
+import platform
+import subprocess
+
 class PrintColored:
     DEFAULT = '\033[0m'
     # Styles
@@ -67,3 +70,14 @@ class PrintColored:
         else:
             values = (*values, default)  # wrap the content within a selected color an a default
         self.print_original(*values, end=end, file=file, flush=flush)
+
+
+def clear_terminal(): 
+    if platform.system()=="Windows":
+        if platform.release() in {"10", "11"}:
+            subprocess.run("", shell=True) #Needed to fix a bug regarding Windows 10; not sure about Windows 11
+            print("\033c", end="")
+        else:
+            subprocess.run(["cls"])
+    else: #Linux and Mac
+        print("\033c", end="")

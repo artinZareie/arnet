@@ -3,6 +3,5 @@ matplotlib
 numpy
 pydot
 graphviz
-argparse
-pick
+inquirer
 opencv-python
